@@ -34,7 +34,6 @@ app.post("/get-translation", async (req, res) => {
     }
 
     const translation = await translateText({text, target})
-    console.log(translation)
     res.json({translation, text, target})
   } catch (error) {
     console.error(error)
