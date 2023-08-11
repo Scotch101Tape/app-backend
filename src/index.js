@@ -9,7 +9,7 @@ const translate = new Translate({projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
 
 async function translateText({text, target}) {
   const [translation] = await translate.translate(text, target)
-  if (typeof(translation) === "string") {
+  if (typeof (translation) === "string") {
     return translation
   } else {
     throw "something went wrong with the translation"
@@ -24,8 +24,7 @@ app.post("/get-translation", async (req, res) => {
     // Anyone who wants to "hack" this could tho :O
     // Please dont, you dont get anything, and it makes me sad
     const secretAppKey = req.header("X-SECRET-APP-KEY")
-    if (secretAppKey === process.env.SECRET_APP_KEY) {
-    } else {
+    if (secretAppKey !== process.env.SECRET_APP_KEY) {
       throw "secret api key wrong"
     }
 
@@ -36,7 +35,7 @@ app.post("/get-translation", async (req, res) => {
 
     const translation = await translateText({text, target})
     console.log(translation)
-    res.status(200).json({translation}).end()
+    res.json({translation, text, target})
   } catch (error) {
     console.error(error)
     res.status(400).end()
