@@ -18,33 +18,29 @@ async function translateText({text, target}) {
 
 app.use(express.json())
 
-app.post("/get-translation", (req, res) => {
-  new Promise((resolve, _reject) => resolve(req))
-    .then(req => {
-      // My low cost security that should stop most people
-      // Anyone who wants to "hack" this could tho :O
-      // Please dont, you dont get anything, and it makes me sad
-      const secretAppKey = req.header("X-SECRET-APP-KEY")
-      if (secretAppKey === process.env.SECRET_APP_KEY) {
-        return req
-      } else {
-        throw "secret api key wrong"
-      }
-    })
-    .then(req => {
-      const {text, target} = req.body
-      if (target === "en" || target === "ar") {
-        return {text, target}
-      } else {
-        throw "target not arabic or english"
-      }
-    })
-    .then(({text, target}) => translateText({text, target}))
-    .then(translation => {
-      console.log(translation)
-      res.status(200).json({translation}).end()
-    })
-    .catch(_err => console.log(_err) && res.status(400).end())
+app.post("/get-translation", async (req, res) => {
+  try {
+    // My low cost security that should stop most people
+    // Anyone who wants to "hack" this could tho :O
+    // Please dont, you dont get anything, and it makes me sad
+    const secretAppKey = req.header("X-SECRET-APP-KEY")
+    if (secretAppKey === process.env.SECRET_APP_KEY) {
+    } else {
+      throw "secret api key wrong"
+    }
+
+    const {text, target} = req.body
+    if (target !== "en" && target !== "ar") {
+      throw "target not either arabic or english"
+    }
+
+    const translation = await translateText({text, target})
+    console.log(translation)
+    res.status(200).json({translation}).end()
+  } catch (error) {
+    console.error(error)
+    res.status(400).end()
+  }
 })
 
 app.listen(port, () => {
