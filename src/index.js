@@ -8,7 +8,7 @@ const port = 3000
 
 // Mid security
 function hasSecretAppKey(req, res, next) {
-  const secretAppKey = req.header("X_SECRET_APP_KEY")
+  const secretAppKey = req.header("X-SECRET-APP-KEY")
   if (secretAppKey === process.env.SECRET_APP_KEY) {
     next()
   } else {
@@ -16,10 +16,17 @@ function hasSecretAppKey(req, res, next) {
   }
 }
 
+function logger(req, res, next) {
+  console.log("Request")
+  next()
+}
+
+app.use(logger)
 app.use(hasSecretAppKey)
 app.use(express.json())
 
 app.get("/hello", (req, res) => res.send("hi"))
+
 app.post("/translate", translate)
 app.post("/find-places", findPlaces)
 

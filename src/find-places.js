@@ -11,9 +11,13 @@ const client = new Client()
 module.exports = async function findPlaces(req, res) {
   try {
     const {code, location} = req.body
-    let initialQuery
+    let query
     if (code === CODES.RESTAURANT) {
-      initialQuery = "halal restaurant"
+      query = "halal restaurant"
+    } else if (code === CODES.GROCERY) {
+      query = "halal grocery"
+    } else if (code === CODES.MOSQUE) {
+      query = "mosque"
     } else {
       throw "Not yet implemented"
     }
@@ -21,12 +25,16 @@ module.exports = async function findPlaces(req, res) {
     // I can cache placeIds, will do that later
     client.textSearch({
       params: {
-        query: initialQuery,
         key: process.env.GOOGLE_MAPS_API_KEY,
+        query,
         location
       }
-    }).then(({results}) => {
-      res.json(results)
+    }).then(({data}) => {
+      if (data.status === "OK") {
+        res.json(data.results)
+      } else {
+        throw "Not okay >;("
+      }
     })
   } catch(error) {
     console.error(error)
